@@ -1,12 +1,16 @@
 import React from 'react';
 import './App.css';
-import Uploader from "./components/Uploader";
+// import Uploader from "./components/Uploader";
+import Tester from './components/Tester.js';
+// import Demo from "./components/Demo";
 
 
 const App = () => {
   return (
     <div className='container'>
-      <Uploader />
+      {/* <Uploader /> */}
+      <Tester />
+      {/* <Demo /> */}
     </div>
   )
 }

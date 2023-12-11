@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import uploadImg from "../assets/uploadImg.png";
+// import uploadImg from "../assets/uploadImg.png";
 
 const fileTypes = ["JPG", "PNG", "PDF"];
 
