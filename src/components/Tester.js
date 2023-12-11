@@ -1,12 +1,12 @@
 import { Button, Progress, Space, Upload, Typography } from "antd";
-import { FileOutlined,CloudUploadOutlined } from '@ant-design/icons';
+import { FileOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useState } from "react";
 
 const Tester = () => {
 
     const [files, setfiles] = useState({})
-    const handleFlieUpload = ({ file }) => {
+    const handleFileUpload = async ({ file }) => {
         console.log(file);
         const getFileObject = (progress, estimated) => {
             return {
@@ -17,7 +17,15 @@ const Tester = () => {
 
             };
         };
-        axios.post('http://localhost:8000/fileUpload', file, {
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+
+        const req = await axios.post('http://localhost:8000/fileUpload', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
             onUploadProgress: (event) => {
                 // console.log(event);
                 setfiles(pre => {
@@ -25,6 +33,9 @@ const Tester = () => {
                 })
             },
         });
+        // console.log(req);
+        
+
     };
 
     const getTimeString = (timeInSeconds) => {
@@ -42,16 +53,16 @@ const Tester = () => {
     };
 
     return (
-        <Space direction="vertical" style={{ width: "100vw", display:"flex", justifyContent:"center",alignItems: "center", marginTop: 24, }}>
+        <Space direction="vertical" style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", marginTop: 24, }}>
             <Upload.Dragger
                 multiple
                 listType="picture"
-                customRequest={handleFlieUpload}
+                customRequest={handleFileUpload}
                 showUploadList={false}
-                style={{width: 520}}
+                style={{ width: 515 }}
             >
                 <p className="ant-upload-drag-icon">
-                <CloudUploadOutlined style={{ fontSize: '80px', color: '#000' }} />
+                    <CloudUploadOutlined style={{ fontSize: '80px', color: '#000' }} />
                 </p>
                 Drag and Drop files here OR <Button>Click to Upload</Button>
             </Upload.Dragger>
@@ -63,7 +74,9 @@ const Tester = () => {
                             backgroundColor: "rgba(0,0,0,0.05)",
                             width: 500,
                             padding: 8,
+                            borderRadius: 8
                         }}
+                        key={index}
                     >
                         <Space>
                             <FileOutlined />
