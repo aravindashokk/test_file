@@ -19,3 +19,17 @@
   border-radius: 20px;
 
 }
+
+/* Add this CSS in your global stylesheet or within a style tag in your component */
+::-webkit-scrollbar {
+  width: 10px; /* Adjust the width as needed */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Set scrollbar track color to transparent */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2); /* Set scrollbar thumb color with transparency */
+  border-radius: 5px; /* Optionally, add border-radius */
+}
