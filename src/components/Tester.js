@@ -58,7 +58,7 @@ const Tester = () => {
                 multiple
                 customRequest={handleFileUpload}
                 showUploadList={false}
-                style={{ width: 545 }}
+                style={{ width: 560, marginRight: 14 }}
                 beforeUpload={(file) => {
                     console.log(file)
                 }}
@@ -68,14 +68,14 @@ const Tester = () => {
                 </p>
                 Drag and Drop files here OR <Button>Click to Upload</Button>
             </Upload.Dragger>
-            <div style={{ maxHeight: 190, overflowY: 'scroll', width: 545, paddingRight: 1, scrollbarWidth: 'thin' }}>
+            <div style={{ maxHeight: 190, overflowY: 'scroll', width: 575, paddingRight: 1, scrollbarWidth: 'thin' }}>
                 {Object.values(files).map((file, index) => {
                     return (
                         <Space
                             direction="vertical"
                             style={{
                                 backgroundColor: "rgba(0,0,0,0.05)",
-                                width: 500,
+                                width: 545,
                                 padding: 7,
                                 borderRadius: 8,
                                 marginTop: 8,
