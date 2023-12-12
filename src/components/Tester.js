@@ -6,12 +6,14 @@ import { useState } from "react";
 const Tester = () => {
 
     const [files, setfiles] = useState({})
+    const [maxSize, setmaxSize] = useState(false)
     const handleFileUpload = async ({ file }) => {
         // console.log(file);
         const getFileObject = (progress, estimated) => {
             return {
                 name: file.name,
                 uid: file.uid,
+                size: file.size,
                 progress: progress,
                 estimated: estimated || 0,
 
@@ -20,6 +22,17 @@ const Tester = () => {
 
         const formData = new FormData();
         formData.append('file', file);
+
+        const totalSize = Object.values(files).reduce((total, current) => {
+            total += current.size / (1024 * 1024); // convert bytes to MB
+            return total;
+        }, 0);
+
+        // Check if adding the current file exceeds the limit
+        if ((totalSize + file.size / (1024 * 1024)) > 250) {
+            setmaxSize(true);
+            return; // Prevent further processing
+        }
 
 
         const req = await axios.post('http://localhost:8000/fileUpload', formData, {
@@ -38,6 +51,12 @@ const Tester = () => {
 
     };
 
+    const totalSize = Object.values(files).reduce((total,current)=>{
+        // console.log(current)
+        total=Math.floor(total+(current.size/(1024*1024))) //convert bytes to MB
+        return total
+    },0);
+
     const getTimeString = (timeInSeconds) => {
         const hours = Math.floor(timeInSeconds / 3600);
         const minutes = Math.floor(timeInSeconds / 60 - hours * 60);
@@ -53,21 +72,22 @@ const Tester = () => {
     };
 
     return (
-        <Space direction="vertical" style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", marginTop: 24, }}>
+        <Space direction="vertical" style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", marginTop: 134, }}>
             <Upload.Dragger
                 multiple
                 customRequest={handleFileUpload}
                 showUploadList={false}
                 style={{ width: 560, marginRight: 14 }}
-                beforeUpload={(file) => {
-                    console.log(file)
-                }}
+                disabled={maxSize}
             >
                 <p className="ant-upload-drag-icon">
                     <CloudUploadOutlined style={{ fontSize: '80px', color: '#000' }} />
                 </p>
                 Drag and Drop files here OR <Button>Click to Upload</Button>
             </Upload.Dragger>
+            {maxSize ? (<Typography.Text type="danger" style={{marginLeft:-280}}>Total size exceeds 250MB</Typography.Text>) 
+            : (<Typography.Text type="secondary" style={{marginLeft:-280}}>Total size: {totalSize} MB</Typography.Text>)}
+            
             <div style={{ maxHeight: 190, overflowY: 'scroll', width: 575, paddingRight: 1, scrollbarWidth: 'thin' }}>
                 {Object.values(files).map((file, index) => {
                     return (
