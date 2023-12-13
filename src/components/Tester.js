@@ -23,10 +23,11 @@ const Tester = () => {
 
         const formData = new FormData();
         formData.append('file', file);
+        console.log(file)
 
         
 
-        const req = await axios.post('http://localhost:8000/fileUpload', formData, {
+        const req = await axios.post('/api/fileUpload', formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -37,7 +38,8 @@ const Tester = () => {
                 })
             },
         });
-        // console.log(req);
+        console.log(req);
+
 
 
     };
@@ -59,6 +61,7 @@ const Tester = () => {
         setErrorMessage("");
         return true; // Allow uploading files smaller than 250MB
     };
+
 
 
     const getTimeString = (timeInSeconds) => {
