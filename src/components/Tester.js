@@ -1,4 +1,4 @@
-import { Button, Progress, Space, Upload, Typography , message} from "antd";
+import { Button, Progress, Space, Upload, Typography, message } from "antd";
 import { FileOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useState } from "react";
@@ -21,13 +21,31 @@ const Tester = () => {
             };
         };
 
-        const formData = new FormData();
-        formData.append('file', file);
-        console.log(file)
+        // const formData = new FormData();
+        // formData.append('file', file);
+        // console.log("FormData:",formData);
 
-        
+        // console.log(file);
+        const Obj = {
+            fileId: file.uid,
+            filepath: file.name,
+            uploadMonth: '',
+            uploadDay: '',
+            uploadYear: '',
+            uploadTime: file.lastModifiedDate,
+            owner: '',
+            size: file.size,
+            expirationMonth: '',
+            expirationDay: '',
+            expirationYear: '',
+            source: '',
+            tags: '',
+            projectId: ''
 
-        const req = await axios.post('/api/fileUpload', formData, {
+        }
+
+        console.log(Obj);
+        const req = await axios.post('http://localhost:8000/fileUpload', Obj, {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -38,17 +56,17 @@ const Tester = () => {
                 })
             },
         });
-        console.log(req);
+        // console.log(req);
 
 
 
     };
 
-    const totalSize = Object.values(files).reduce((total,current)=>{
+    const totalSize = Object.values(files).reduce((total, current) => {
         // console.log(current)
-        total=Math.floor(total+(current.size/(1024*1024))) //convert bytes to MB
+        total = Math.floor(total + (current.size / (1024 * 1024))) //convert bytes to MB
         return total
-    },0);
+    }, 0);
 
     const beforeUpload = (file) => {
         const maxFileSize = 250 * 1024 * 1024; // 250MB limit
@@ -82,20 +100,21 @@ const Tester = () => {
         <Space direction="vertical" style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", marginTop: 134, }}>
             {errorMessage && (<Typography.Text type="danger">{errorMessage}</Typography.Text>)}
             <Upload.Dragger
+                data-testid="upload-input"
                 multiple
                 customRequest={handleFileUpload}
                 showUploadList={false}
                 beforeUpload={beforeUpload}
                 style={{ width: 560, marginRight: 14 }}
-                
+
             >
                 <p className="ant-upload-drag-icon">
                     <CloudUploadOutlined style={{ fontSize: '80px', color: '#000' }} />
                 </p>
                 Drag and Drop files here OR <Button>Click to Upload</Button>
             </Upload.Dragger>
-            <Typography.Text type="secondary" style={{marginLeft:-280}}>Total size: {totalSize} MB</Typography.Text>
-            
+            <Typography.Text type="secondary" style={{ marginLeft: -280 }}>Total size: {totalSize} MB</Typography.Text>
+
             <div style={{ maxHeight: 190, overflowY: 'scroll', width: 575, paddingRight: 1, scrollbarWidth: 'thin' }}>
                 {Object.values(files).map((file, index) => {
                     return (
