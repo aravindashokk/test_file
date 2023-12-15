@@ -36,40 +36,79 @@ const Tester = () => {
         formData.append('file', file);
         formData.append('metadata', JSON.stringify(metadata));
 
-        try {
-            const response = await axios.post('http://localhost:8000/fileUpload', formData, {
-                onUploadProgress: (event) => {
+        axios.post('http://localhost:8000/fileUpload', formData, {
+            onUploadProgress: (event) => {
+                setFiles(prevFiles => ({
+                    ...prevFiles,
+                    [file.uid]: getFileObject(event.progress, event.estimated)
+                }));
+            },
+        })
+            .then((response) => {
+                if (response.status >= 200 && response.status < 300) {
                     setFiles(prevFiles => ({
                         ...prevFiles,
-                        [file.uid]: getFileObject(event.progress, event.estimated)
+                        [file.uid]: {
+                            ...prevFiles[file.uid],
+                            color: '#52c41a',
+                            success: true,
+                            
+                        }
+                        
                     }));
-                },
-            });
+                } else {
+                    console.log(response);
+                    setFiles(prevFiles => ({
+                        ...prevFiles,
+                        [file.uid]: { ...prevFiles[file.uid], color: 'red', isError: true, }
+                    }));
+                    
 
-            if (response.status >= 200 && response.status < 300) {
+
+
+                }
+                setErrorMessage(response.message)
+            })
+            .catch((error) => {
+                console.log(error);
                 setFiles(prevFiles => ({
                     ...prevFiles,
-                    [file.uid]: {
-                        ...prevFiles[file.uid],
-                        color: '#52c41a', 
-                        success: true, 
+                    [file.uid]: { ...prevFiles[file.uid], color: 'red', isError: true, errorMessage: `${error}` }
+                }));
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    if (statusCode === 400) {
+                        setErrorMessage("Bad Request");
+                    } else if (statusCode === 413) {
+                        setErrorMessage("File size exceeds limit");
+                    }else if (statusCode === 415) {
+                        setErrorMessage("File extension not allowed");
+                    }else if (statusCode === 500) {
+                        setErrorMessage("Internal Server Error");
+                    }else{
+                        setErrorMessage(error.message);
                     }
-                }));
-            } else {
-                setFiles(prevFiles => ({
-                    ...prevFiles,
-                    [file.uid]: { ...prevFiles[file.uid], color: 'red', isError: true }
-                }));
-                setErrorMessage(`${response.status}: ${response.statusText}`);
-            }
-        } catch (error) {
-            setFiles(prevFiles => ({
-                ...prevFiles,
-                [file.uid]: { ...prevFiles[file.uid], color: 'red', isError: true }
-            }));
-            setErrorMessage(error.message);
-        }
+
+
+
+                }});
+
     };
+
+    // const getErrorMessage = (statusCode) => {
+    //     switch (statusCode) {
+    //         case 400:
+    //             return "Bad Request";
+    //         case 413:
+    //             return "File size exceeds limit";
+    //         case 415:
+    //             return "File extension is not allowed";
+    //         case 500:
+    //             return "Internal Server Error";
+    //         default:
+    //             return "Unknown Error";
+    //     }
+    // };
 
     const totalSize = Object.values(files).reduce((total, current) => {
         total = Math.floor(total + (current.size / (1024 * 1024))); // Convert bytes to MB
@@ -100,6 +139,7 @@ const Tester = () => {
         }
         return timeString;
     };
+
 
     return (
         <Space direction="vertical" style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", marginTop: 134 }}>
@@ -140,7 +180,7 @@ const Tester = () => {
                                 </Typography.Text>
                             ) : (
                                 <Typography.Text type="secondary">
-                                    {file.isError ? " upload failed" : "uploaded successfully"}
+                                    {file.isError ? errorMessage : "Successful file upload"}
                                 </Typography.Text>
                             )}
                         </Space>
@@ -150,8 +190,8 @@ const Tester = () => {
                             format={() =>
                                 file.isError ? (
                                     <CloseCircleOutlined style={{ color: 'red' }} />
-                                ) : (<CheckCircleOutlined style={{ color: '#52c41a' }} /> )
-                                
+                                ) : (<CheckCircleOutlined style={{ color: '#52c41a' }} />)
+
                             }
                         />
                     </Space>
